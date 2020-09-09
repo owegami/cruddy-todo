@@ -84,18 +84,6 @@ exports.update = (id, text, callback) => {
 };
 
 exports.delete = (id, callback) => {
-  // var item = items[id];
-  // delete items[id];
-  // if (!item) {
-  //   // report an error if item not found
-  //   callback(new Error(`No item with id: ${id}`));
-  // } else {
-  //   callback();
-  // }
-
-  // - should not change the counter
-  // - should delete todo file by id
-  // - should return an error for non-existant id
 
   exports.readOne(id, (err, object) => {
     if (err) {
