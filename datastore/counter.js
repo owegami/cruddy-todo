@@ -50,28 +50,30 @@ const writeCounter = (count, callback) => {
 exports.getNextUniqueId = (callback) => {
 
   readCounter((err, count) => {
+    // read file and get count if available (or 0 if unavail)
     if (err) {
       throw ('error reading count');
     } else {
-      // counter becomes a number
-      // increment counter
       count += 1;
-      // now write that counter to txt file
-      writeCounter(count, (err, count) => {
-        // now read the counter again
-        readCounter((err, count) => {
-          if (err) {
-            throw ('error reading updated count');
-          } else {
-            // do we need to return here?
-            return zeroPaddedNumber(count);
-          }
-        });
+      // overwrite the file with the updated counter
+      writeCounter(count, (err2, count) => {
+        if (err2) {
+          throw ('error writing incremented counter to txt file');
+        } else {
+          // read the updated counter
+          readCounter((err3, count) => {
+            if (err3) {
+              throw ('error reading updated counter');
+            } else {
+              // 2nd param must be a zero padded number, 1st must be null
+              callback(null, zeroPaddedNumber(count));
+            }
+          });
+        }
       });
     }
   });
 };
-
 
 
 // Configuration -- DO NOT MODIFY //////////////////////////////////////////////
