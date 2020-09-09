@@ -84,14 +84,31 @@ exports.update = (id, text, callback) => {
 };
 
 exports.delete = (id, callback) => {
-  var item = items[id];
-  delete items[id];
-  if (!item) {
-    // report an error if item not found
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback();
-  }
+  // var item = items[id];
+  // delete items[id];
+  // if (!item) {
+  //   // report an error if item not found
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   callback();
+  // }
+
+  // - should not change the counter
+  // - should delete todo file by id
+  // - should return an error for non-existant id
+
+  exports.readOne(id, (err, object) => {
+    if (err) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      fs.unlink(path.join(exports.dataDir, id + '.txt'), (err2) => {
+        if (err2) {
+          throw ('error deleting file');
+        }
+        callback(null, () => console.log('File has been deleted!'));
+      });
+    }
+  });
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
