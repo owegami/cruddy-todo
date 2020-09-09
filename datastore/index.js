@@ -29,16 +29,6 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = (callback) => {
-  // var data = _.map(items, (text, id) => {
-  //   return { id, text };
-  // });
-  // callback(null, data);
-
-  // files: ['filename', 'filename', 'filename']
-  // fs.readFile(path, callback(err, data) data is the contents of the file)
-
-  // const expectedTodoList = [{ id: '00001', text: '00001' }, { id: '00002', text: '00002' }];
-
   var data;
 
   fs.readdir(exports.dataDir, (err, files) => {
@@ -46,43 +36,51 @@ exports.readAll = (callback) => {
       throw ('Cannot read the given directory');
     } else {
       data = _.map(files, (filename) => {
-        fs.readFile(path.join(exports.dataDir, filename), (err2, text) => {
-          if (err2) {
-            throw ('Cannot read file within given directory');
-          } else {
-            // let id = filename.substring(0, 5);
-            return { 'id': filename.substring(0, 5), 'text': filename.substring(0, 5) };
-          }
-        });
+        return { 'id': filename.substring(0, 5), 'text': filename.substring(0, 5) };
       });
       callback(null, data);
     }
   });
-
-  // fs.readdir(path[,options], callback); return an array of all file names
-  // exports.dataDir
-  //callback(err, files [names of files in directory minus '.' and '..' in file name])
-
-  // return an array of todos, example: [{id: #, text: #}, {id: #2, text: #2}]
 };
+
 
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+
+  fs.readdir(exports.dataDir, (err, files) => {
+    if (err) {
+      throw ('Cannot read the given directory');
+    } else {
+      var result = files.indexOf(id + '.txt');
+      if (result === -1) {
+        callback(new Error(`No item with id: ${id}`));
+      } else {
+        fs.readFile(path.join(exports.dataDir, files[result]), 'utf8', (err2, innerText) => {
+          if (err2) {
+            throw ('Cannot read file within given directory');
+          } else {
+            callback(null, {id: id, text: innerText});
+          }
+        });
+      }
+    }
+  });
 };
 
+
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+
+  exports.readOne(id, (err, object) => {
+    if (err) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      fs.writeFile(path.join(exports.dataDir, id + '.txt'), text, (err2) => {
+        if (err2) {
+          throw ('error updating file to be created');
+        }
+        callback(null, () => console.log('File has been written!'));
+      });
+    }
+  });
 };
 
 exports.delete = (id, callback) => {
